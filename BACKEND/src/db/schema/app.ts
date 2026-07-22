@@ -1,10 +1,11 @@
-import { desc } from 'drizzle-orm';
+import { desc, relations } from 'drizzle-orm';
 import { pgTable, integer, varchar, timestamp } from 'drizzle-orm/pg-core';
+import e from 'express';
 
 
 const timestamps = {
   createdAt: timestamp('created_at').defaultNow().notNull(),
-  updatedAt: timestamp('updated_at').defaultNow().onUpdateNow().notNull(),
+  updatedAt: timestamp('updated_at').defaultNow().$onUpdate(() => new Date()).notNull(),
 };
 
 export const departments = pgTable('departments', {
@@ -22,10 +23,26 @@ export const subjects = pgTable('subjects', {
   name: varchar('name', {length:255}).notNull(),
   code: varchar('code', { length: 55 }).notNull().unique(),
   description: varchar('description', {length:255}),
-    ...timestamps,  //destructuring the timestamps object to include createdAt and updatedAt fields in the users table
+    ...timestamps, 
 });
 
 
 //Creating relations between the tables
 
+export const departmentRelations = relations(departments, ({ many }) => ({
+  subjects: many(subjects),
+}));
 
+export const subjectRelations = relations(subjects, ({ one, many }) => ({
+  department: one(departments, {
+    fields: [subjects.departmentId],
+    references: [departments.id],
+  }),
+}));
+
+
+export type Department = typeof departments.$inferSelect;
+export type NewDepartment = typeof departments.$inferInsert;
+
+export type Subject = typeof subjects.$inferSelect;
+export type NewSubject = typeof subjects.$inferInsert;
