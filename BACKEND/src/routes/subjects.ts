@@ -10,8 +10,8 @@ router.get("/", async (req, res) => {
 try{
 const { search, department, page = 1,limit = 10 } = req.query;
 
-const currentPage = Math.max(1, +page);
-const limitPerPage = Math.max(1, +limit);
+const currentPage = Math.max(1, parseInt(String(page), 10) || 1);
+const limitPerPage = Math.min(Math.max(1, parseInt(String(limit), 10) || 10), 100);
 
 const offset = (currentPage - 1) * limitPerPage; //how many records to skip to go to the next page
 
@@ -19,7 +19,7 @@ const filterConditions = [];
 
 //if search query parameter is provided, add a filter condition for name or code
 if (search) {
-  filterCondirions.push(
+  filterConditions.push(
     or(
       ilike(subjects.name, `%${search}%`),
       ilike(subjects.code, `%${search}%`)
@@ -29,7 +29,8 @@ if (search) {
 
 //if department query parameter is provided, add a filter condition for departmentId
 if (department) {
-  filterConditions.push(ilike(departments.name, `%${department}%`));
+  const deptPattern = `%${String(department).replace(/[%_]/g, '\\$&')}%`; //prevents sql injections
+  filterConditions.push(ilike(departments.name, deptPattern));
 }
 
 
