@@ -8,6 +8,13 @@
       "when": 1784712817711,
       "tag": "0000_jazzy_gabe_jones",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1784904340056,
+      "tag": "0001_exotic_scarlet_witch",
+      "breakpoints": true
     }
   ]
 }
