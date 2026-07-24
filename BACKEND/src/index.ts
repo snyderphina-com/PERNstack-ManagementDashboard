@@ -1,7 +1,7 @@
 import express from 'express';
 import cors from 'cors';
 
-import subjectsRouter from "./routes/subjects"
+import subjectsRouter from "./routes/subjects.js"
 
 
 const app = express();
