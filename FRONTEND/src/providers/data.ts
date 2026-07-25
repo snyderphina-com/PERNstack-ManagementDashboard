@@ -6,7 +6,7 @@ import { createDataProvider, CreateDataProviderOptions } from "@refinedev/rest";
 if (!BACKEND_BASE_URL) throw new Error("BACKEND_BASE_URL is not configured. Please set VITE_BACKEND_BASE_URL in the .env fie.");
 
 
-const buildHttpError = async (response: response): Promise<HttpError> => {
+const buildHttpError = async (response): Promise<HttpError> => {
   let message = 'Request Failed.';
 
 try {
