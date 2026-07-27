@@ -23,7 +23,7 @@ import {
 import SubjectsList from "./pages/subjects/list";
 import { Layout } from "./components/refine-ui/layout/layout";
 import SubjectsCreate from "./pages/subjects/create";
-import SubjectsShow from "./pages/subjects/show.tsx";
+import SubjectsShow from "./pages/subjects/show";
 import Dashboard from "./pages/dashboard";
 
 import { dataProvider } from "./providers/data";
