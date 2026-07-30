@@ -19,7 +19,7 @@ const cld = new Cloudinary({
 
 export const bannerPhoto = (imageCldPubId: string, name: string) => {
   return (
-    cld
+    cld  //this is the instance of claudinary
       .image(imageCldPubId)
 
       .resize(
@@ -28,7 +28,7 @@ export const bannerPhoto = (imageCldPubId: string, name: string) => {
       // Optimize for web
       .delivery(format("auto"))
       .delivery(quality("auto"))
-      .delivery(dpr("auto"))
+      .delivery(dpr("auto")) //this is Device Pixel Ratio
       // Text overlay with name
       .overlay(
         source(
@@ -37,7 +37,7 @@ export const bannerPhoto = (imageCldPubId: string, name: string) => {
           )
         ).position(
           new Position()
-            .gravity(compass("south_west"))
+            .gravity(compass("west"))
             .offsetY(0.2)
             .offsetX(0.02)
         )

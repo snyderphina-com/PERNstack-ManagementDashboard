@@ -256,5 +256,4 @@ const getInitials = (name = "") => {
     parts[parts.length - 1][0] ?? ""
   }`.toUpperCase();
 };
-
 export default ClassesShow;
