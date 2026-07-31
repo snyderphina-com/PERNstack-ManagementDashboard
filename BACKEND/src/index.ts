@@ -3,6 +3,8 @@ AgentAPI.config()
 
 import express from 'express';
 import cors from 'cors';
+import { auth } from "./lib/auth.js";
+import { toNodeHandler } from "better-auth/node";
 
 import subjectsRouter from "./routes/subjects.js"
 import usersRouter from "./routes/users.js"
@@ -25,6 +27,8 @@ app.use(cors({
 app.use(express.json());
 
 app.use(securityMiddleware);
+
+app.all("/api/auth/*", toNodeHandler(auth) as any);
 
 app.use('/api/subjects', subjectsRouter);
 app.use('/api/users', usersRouter);
