@@ -5,13 +5,12 @@
     "lib": ["ES2022"],
 
     /* Node ESM */
-    /* Node ESM */
-"module": "NodeNext",
-"moduleResolution": "NodeNext",
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
 
     /* Project structure */
-    "rootDir": ".",
-    "outDir": "dist",
+    "rootDir": "./src",
+    "outDir": "./dist",
 
     /* Type safety */
     "strict": true,
@@ -32,7 +31,12 @@
     "types": ["node"]
   },
   "include": [
-    "src",
-    "drizzle.config.ts"
+    "src/**/*"
+  ],
+  "exclude": [
+    "node_modules",
+    "dist",
+    "drizzle.config.ts",
+    "seed/**/*"
   ]
 }
