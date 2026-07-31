@@ -28,7 +28,7 @@ app.use(express.json());
 
 app.use(securityMiddleware);
 
-app.all("/api/auth/*", toNodeHandler(auth) as any);
+app.all("/api/auth/*splat", toNodeHandler(auth) as any);
 
 app.use('/api/subjects', subjectsRouter);
 app.use('/api/users', usersRouter);
