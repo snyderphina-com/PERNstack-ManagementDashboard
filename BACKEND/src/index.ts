@@ -11,7 +11,7 @@ import departmentsRouter from "./routes/departments.js"
 import securityMiddleware from './middleware/security.js';
 
 const app = express();
-const PORT = 8000;
+const PORT = Number(process.env.PORT) || 8000;
 
 if (!process.env.DATABASE_URL) {
   throw new Error('DATABASE_URL is not set in .env file');
@@ -19,7 +19,7 @@ if (!process.env.DATABASE_URL) {
 
 app.use(cors({
   origin: process.env.FRONTEND_URL,
-  methods: ['GET', 'POST', 'PUT', 'DELET'],
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],
   credentials: true
 }))
 app.use(express.json());
