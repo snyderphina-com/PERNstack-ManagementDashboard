@@ -24,11 +24,11 @@ app.use(cors({
   methods: ['GET', 'POST', 'PUT', 'DELETE'],
   credentials: true
 }));
+
 app.use(express.json());
+app.all("/api/auth/*splat", toNodeHandler(auth) as any);
 
 app.use(securityMiddleware);
-
-app.all("/api/auth/*splat", toNodeHandler(auth) as any);
 
 app.use('/api/subjects', subjectsRouter);
 app.use('/api/users', usersRouter);
