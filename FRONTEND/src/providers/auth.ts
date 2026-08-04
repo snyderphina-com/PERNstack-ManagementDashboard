@@ -51,6 +51,9 @@ export const authProvider: AuthProvider = {
     }
   },
   login: async ({ email, password }) => {
+
+  console.log("authProvider params:", { email, password });
+  
     try {
       const { data, error } = await authClient.signIn.email({
         email: email,

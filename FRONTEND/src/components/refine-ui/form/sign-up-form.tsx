@@ -39,6 +39,12 @@ export const SignUpForm = () => {
   const handleSignUp = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
+      console.log("SIGNUP FORM VALUES:", {
+    email,
+    password,
+    confirmPassword,
+  });
+
     if (password !== confirmPassword) {
       open?.({
         type: "error",
