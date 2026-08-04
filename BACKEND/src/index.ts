@@ -3,7 +3,7 @@ AgentAPI.config();
 
 import express from 'express';
 import cors from 'cors';
-import { auth } from "./lib/auth.js";
+import { auth } from "./db/lib/auth.js";
 import { toNodeHandler } from "better-auth/node";
 
 import subjectsRouter from "./routes/subjects.js";
@@ -25,8 +25,9 @@ app.use(cors({
   credentials: true
 }));
 
-app.use(express.json());
+
 app.all("/api/auth/*splat", toNodeHandler(auth) as any);
+app.use(express.json());
 
 app.use(securityMiddleware);
 
