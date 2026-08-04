@@ -24,6 +24,7 @@ import { InputPassword } from "@/components/refine-ui/form/input-password";
 import { cn } from "@/lib/utils";
 
 export const SignUpForm = () => {
+  const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -40,6 +41,7 @@ export const SignUpForm = () => {
     e.preventDefault();
 
       console.log("SIGNUP FORM VALUES:", {
+    name,
     email,
     password,
     confirmPassword,
@@ -57,7 +59,7 @@ export const SignUpForm = () => {
     }
 
    register({
-  name: email.split("@")[0],
+  name,
   email,
   password,
   role: "student",
@@ -121,6 +123,18 @@ export const SignUpForm = () => {
 
         <CardContent className={cn("px-0")}>
           <form onSubmit={handleSignUp}>
+ <div className={cn("flex", "flex-col", "gap-2")}>
+    <Label htmlFor="name">Name</Label>
+    <Input
+      id="name"
+      type="text"
+      placeholder="Your name"
+      required
+      value={name}
+      onChange={(e) => setName(e.target.value)}
+    />
+  </div>
+
             <div className={cn("flex", "flex-col", "gap-2")}>
               <Label htmlFor="email">Email</Label>
               <Input
