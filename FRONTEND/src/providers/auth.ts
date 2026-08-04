@@ -50,10 +50,31 @@ export const authProvider: AuthProvider = {
       };
     }
   },
-  login: async ({ email, password }) => {
+  login: async ({ email, password, providerName }) => {
 
-  console.log("authProvider params:", { email, password });
+  console.log("authProvider params:", { email, password, providerName });
   
+if (providerName) {
+  return {
+    success: false,
+    error: {
+      name: "Provider login not configured",
+      message: "Google/GitHub login is not configured yet.",
+    },
+  };
+}
+
+if (!email || !password) {
+  return {
+    success: false,
+    error: {
+      name: "Missing credentials",
+      message: "Email and password are required.",
+    },
+  };
+}
+
+
     try {
       const { data, error } = await authClient.signIn.email({
         email: email,

@@ -56,10 +56,12 @@ export const SignUpForm = () => {
       return;
     }
 
-    register({
-      email,
-      password,
-    });
+   register({
+  name: email.split("@")[0],
+  email,
+  password,
+  role: "student",
+});
   };
 
   const handleSignUpWithGoogle = () => {

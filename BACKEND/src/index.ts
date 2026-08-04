@@ -19,15 +19,16 @@ if (!process.env.DATABASE_URL) {
   throw new Error('DATABASE_URL is not set in .env file');
 }
 
+console.log("FRONTEND_URL:", process.env.FRONTEND_URL);
 app.use(cors({
   origin: process.env.FRONTEND_URL,
   methods: ['GET', 'POST', 'PUT', 'DELETE'],
   credentials: true
 }));
 
-
-app.all("/api/auth/*splat", toNodeHandler(auth) as any);
 app.use(express.json());
+app.all("/api/auth/*splat", toNodeHandler(auth) as any);
+
 
 app.use(securityMiddleware);
 

@@ -16,7 +16,7 @@ export const auth = betterAuth({
     user: {
         additionalFields: {
             role: {
-                 type: 'string', required: true, defaultValue: 'student', input: true
+                 type: 'string', required: false, defaultValue: 'student', input: true
 
             },
              imageCldPubId: {
