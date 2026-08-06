@@ -58,7 +58,9 @@ function App() {
                 warnWhenUnsavedChanges: true,
                 projectId: "kkWuv7-GgBIfw-P8CGy0",
                 title: {
-    text: "PERN Dashboard",
+    text: (<>
+    SNYDER<sup className="text-xs">®</sup>
+          </> ),
     icon: (
       <img
         src="/logo.png"
