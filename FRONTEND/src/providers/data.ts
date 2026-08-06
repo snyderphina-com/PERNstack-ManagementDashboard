@@ -5,7 +5,7 @@ import { BACKEND_BASE_URL } from "@/constants";
 
 const options: CreateDataProviderOptions = {
   getList: {
-    getEndpoint: ({ resource }) => `/api/${resource}`,
+    getEndpoint: ({ resource }) => `api/${resource}`,
 
     buildQueryParams: async ({ resource, pagination, filters }) => {
       const params: Record<string, string | number> = {};
@@ -64,8 +64,8 @@ const options: CreateDataProviderOptions = {
 
 create: {
   getEndpoint: ({ resource }) => {
-    console.log("CREATE URL:", `/api/${resource}`);
-    return `/api/${resource}`;
+    console.log("CREATE URL:", `api/${resource}`);
+    return `api/${resource}`;
   },
 
   buildBodyParams: async ({ variables }) => variables,
