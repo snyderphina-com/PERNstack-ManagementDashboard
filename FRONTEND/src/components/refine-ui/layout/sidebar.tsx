@@ -244,7 +244,7 @@ function SidebarHeader() {
         )}
       >
         <div className="shrink-0">
-       {title.icon}
+        {title.icon}
         </div>
         <h2
           className={cn(
