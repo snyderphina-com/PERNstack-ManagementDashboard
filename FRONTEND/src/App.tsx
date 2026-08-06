@@ -57,6 +57,16 @@ function App() {
                 syncWithLocation: true,
                 warnWhenUnsavedChanges: true,
                 projectId: "kkWuv7-GgBIfw-P8CGy0",
+                title: {
+    text: "PERN Dashboard",
+    icon: (
+      <img
+        src="/logo.png"
+        alt="PERN Dashboard"
+        className="h-8 w-8 rounded-md"
+      />
+    ),
+  },
               }}
               resources={[
                 {
