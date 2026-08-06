@@ -114,16 +114,13 @@ router.get("/:id", async (req, res) => {
       });
     }
 
-    const [subject] = await db
-      .select({
-        ...getTableColumns(subjects),
-        department: {
-          ...getTableColumns(departments),
-        },
-      })
-      .from(subjects)
-      .leftJoin(departments, eq(subjects.departmentId, departments.id))
-      .where(eq(subjects.id, id));
+    const subject = await db.query.subjects.findFirst({
+      where: eq(subjects.id, id),
+      with: {
+        department: true,
+        classes: true,
+      },
+    });
 
     if (!subject) {
       return res.status(404).json({
@@ -132,12 +129,17 @@ router.get("/:id", async (req, res) => {
     }
 
     res.status(200).json({
-      data: { 
-        subject
+      data: {
+        subject,
+        totals: {
+          classes: subject.classes.length,
+        },
       },
     });
+
   } catch (error) {
     console.error("GET /subjects/:id error:", error);
+
     res.status(500).json({
       error: "Failed to fetch subject",
     });
