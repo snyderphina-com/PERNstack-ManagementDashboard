@@ -76,5 +76,29 @@ pagination: {
 
 });
 
+router.post("/", async (req, res) => {
+  try {
+    const { name, code, description, departmentId } = req.body;
+
+    const [newSubject] = await db
+      .insert(subjects)
+      .values({
+        name,
+        code,
+        description,
+        departmentId,
+      })
+      .returning();
+
+    res.status(201).json({
+      data: newSubject,
+    });
+  } catch (error) {
+    console.error("POST /subjects error:", error);
+    res.status(500).json({
+      error: "Failed to create subject",
+    });
+  }
+});
 
 export default router;
