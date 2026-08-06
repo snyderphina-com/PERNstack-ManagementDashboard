@@ -77,7 +77,7 @@ create: {
 },
 
   getOne: {
-    getEndpoint: ({ resource, id }) => `${resource}/${id}`,
+    getEndpoint: ({ resource, id }) => `api/${resource}/${id}`,
 
     mapResponse: async (response) => {
       const json: GetOneResponse = await response.json();
