@@ -223,7 +223,7 @@ function SidebarHeader() {
         "flex-row",
         "items-center",
         "justify-between",
-        "overflow-hidden"
+        "overflow-visible",
       )}
     >
       <div
@@ -243,7 +243,9 @@ function SidebarHeader() {
           }
         )}
       >
-        <div>{title.icon}</div>
+        <div className="shrink-0">
+       {title.icon}
+        </div>
         <h2
           className={cn(
             "text-sm",
