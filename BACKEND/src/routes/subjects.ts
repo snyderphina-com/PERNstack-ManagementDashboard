@@ -101,4 +101,44 @@ router.post("/", async (req, res) => {
   }
 });
 
+
+router.get("/:id", async (req, res) => {
+  try {
+    const id = Number(req.params.id);
+
+    if (Number.isNaN(id)) {
+      return res.status(400).json({
+        error: "Invalid subject ID",
+      });
+    }
+
+    const [subject] = await db
+      .select({
+        ...getTableColumns(subjects),
+        department: {
+          ...getTableColumns(departments),
+        },
+      })
+      .from(subjects)
+      .leftJoin(departments, eq(subjects.departmentId, departments.id))
+      .where(eq(subjects.id, id));
+
+    if (!subject) {
+      return res.status(404).json({
+        error: "Subject not found",
+      });
+    }
+
+    res.status(200).json({
+      data: subject,
+    });
+  } catch (error) {
+    console.error("GET /subjects/:id error:", error);
+    res.status(500).json({
+      error: "Failed to fetch subject",
+    });
+  }
+});
+
+
 export default router;
