@@ -2,6 +2,8 @@ import express from "express";
 import {ilike, or, sql, eq, getTableColumns, desc, and } from "drizzle-orm";
 import {departments,subjects} from "../db/schema/app.js";
 import { db } from "../db/index.js";
+import { user } from "../db/schema/auth.js";
+import { classes, enrollments } from "../db/schema/index.js";
 
 const router = express.Router();
 
@@ -140,5 +142,97 @@ router.get("/:id", async (req, res) => {
   }
 });
 
+router.get("/:id/users", async (req, res) => {
+  try {
+    const subjectId = Number(req.params.id);
+    const role = req.query.role;
+
+    if (!role || !["teacher", "student"].includes(role as string)) {
+      return res.status(400).json({
+        message: "role must be teacher or student",
+      });
+    }
+
+
+    // Teachers assigned to classes under this subject
+    if (role === "teacher") {
+      const teachers = await db
+        .selectDistinct({
+          id: user.id,
+          name: user.name,
+          email: user.email,
+          role: user.role,
+          image: user.image,
+        })
+        .from(classes)
+        .innerJoin(user, eq(classes.teacherId, user.id))
+        .where(eq(classes.subjectId, subjectId));
+
+
+      return res.json({
+        data: teachers,
+      });
+    }
+
+
+    // Students enrolled in classes under this subject
+    const students = await db
+      .selectDistinct({
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+        image: user.image,
+      })
+      .from(enrollments)
+      .innerJoin(classes, eq(enrollments.classId, classes.id))
+      .innerJoin(user, eq(enrollments.studentId, user.id))
+      .where(eq(classes.subjectId, subjectId));
+
+
+    return res.json({
+      data: students,
+    });
+
+
+  } catch (error) {
+    console.error(error);
+
+    res.status(500).json({
+      message: "Failed to fetch subject users",
+    });
+  }
+});
+
+
+router.get("/:id/classes", async (req, res) => {
+  try {
+    const subjectId = Number(req.params.id);
+
+    const classesData = await db.query.classes.findMany({
+      where: eq(classes.subjectId, subjectId),
+      with: {
+        teacher: {
+          columns: {
+            id: true,
+            name: true,
+            email: true,
+          },
+        },
+      },
+    });
+
+    res.json({
+      data: classesData,
+    });
+
+  } catch (error) {
+    console.error(error);
+
+    res.status(500).json({
+      message: "Failed to fetch subject classes",
+    });
+  }
+});
 
 export default router;
