@@ -62,7 +62,7 @@ function App() {
     icon: (
       <img
         src="/logo.png"
-        alt="PERN Dashboard"
+        alt="SNYDER"
         className="h-8 w-8 rounded-md"
       />
     ),
