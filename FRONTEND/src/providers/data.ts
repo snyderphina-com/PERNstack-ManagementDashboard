@@ -62,16 +62,19 @@ const options: CreateDataProviderOptions = {
     },
   },
 
-  create: {
-    getEndpoint: ({ resource }) => resource,
-
-    buildBodyParams: async ({ variables }) => variables,
-
-    mapResponse: async (response) => {
-      const json: CreateResponse = await response.json();
-      return json.data ?? {};
-    },
+create: {
+  getEndpoint: ({ resource }) => {
+    console.log("CREATE URL:", `/api/${resource}`);
+    return `/api/${resource}`;
   },
+
+  buildBodyParams: async ({ variables }) => variables,
+
+  mapResponse: async (response) => {
+    const json: CreateResponse = await response.json();
+    return json.data ?? {};
+  },
+},
 
   getOne: {
     getEndpoint: ({ resource, id }) => `${resource}/${id}`,
