@@ -132,7 +132,9 @@ router.get("/:id", async (req, res) => {
     }
 
     res.status(200).json({
-      data: subject,
+      data: { 
+        subject
+      },
     });
   } catch (error) {
     console.error("GET /subjects/:id error:", error);
