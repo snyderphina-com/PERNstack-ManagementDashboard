@@ -10,6 +10,7 @@ import subjectsRouter from "./routes/subjects.js";
 import usersRouter from "./routes/users.js";
 import classesRouter from "./routes/classes.js";
 import departmentsRouter from "./routes/departments.js";
+import enrollmentsRouter from "./routes/enrollments.js";
 import securityMiddleware from './middleware/security.js';
 
 const app = express();
@@ -29,13 +30,14 @@ app.use(cors({
 app.use(express.json());
 app.all("/api/auth/*splat", toNodeHandler(auth) as any);
 
-
 app.use(securityMiddleware);
 
 app.use('/api/subjects', subjectsRouter);
 app.use('/api/users', usersRouter);
 app.use('/api/classes', classesRouter);
 app.use('/api/departments', departmentsRouter);
+app.use('/api/enrollments', enrollmentsRouter);
+console.log("ENROLLMENTS ROUTE LOADED");
 
 app.get('/', (req, res) => {
   res.send('Hello Welcome to the Classroom Api');
