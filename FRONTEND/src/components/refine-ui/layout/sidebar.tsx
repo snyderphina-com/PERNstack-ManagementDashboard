@@ -223,7 +223,7 @@ function SidebarHeader() {
         "flex-row",
         "items-center",
         "justify-between",
-        "overflow-visible",
+        "overflow-hidden"
       )}
     >
       <div
