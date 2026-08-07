@@ -1,4 +1,5 @@
-export type ThemeKey = "pink" | "blue" | "green" | "purple" | "orange";
+export type ThemeKey = 
+"pink" | "blue" | "purple" | "orange" | "mint" | "gold" | "ruby";
 
 export interface ThemeVars {
   "--primary": string;
@@ -135,6 +136,52 @@ export const themes: Theme[] = [
       "--chart-1":                    "oklch(0.5800 0.1800 50.0000)",
     },
   },
+  {
+  key: "gold",
+  label: "Gold",
+  swatch: "oklch(0.7800 0.1500 90.0000)",
+  light: {
+    "--primary":                    "oklch(0.7000 0.1500 90.0000)",
+    "--primary-foreground":         "oklch(0.2000 0.0300 90.0000)",
+    "--ring":                       "oklch(0.7500 0.1600 90.0000)",
+    "--sidebar-primary":            "oklch(0.7500 0.1600 90.0000)",
+    "--sidebar-primary-foreground": "oklch(0.2000 0.0300 90.0000)",
+    "--sidebar-ring":               "oklch(0.7500 0.1600 90.0000)",
+    "--chart-1":                    "oklch(0.7200 0.1700 90.0000)",
+  },
+  dark: {
+    "--primary":                    "oklch(0.6500 0.1400 90.0000)",
+    "--primary-foreground":         "oklch(0.9800 0.0200 90.0000)",
+    "--ring":                       "oklch(0.7000 0.1500 90.0000)",
+    "--sidebar-primary":            "oklch(0.7000 0.1500 90.0000)",
+    "--sidebar-primary-foreground": "oklch(0.9800 0.0200 90.0000)",
+    "--sidebar-ring":               "oklch(0.7000 0.1500 90.0000)",
+    "--chart-1":                    "oklch(0.6500 0.1400 90.0000)",
+  },
+},
+{
+  key: "ruby",
+  label: "Ruby",
+  swatch: "oklch(0.5800 0.1400 20.0000)",
+  light: {
+    "--primary":                    "oklch(0.5500 0.1400 20.0000)",
+    "--primary-foreground":         "oklch(1.0000 0 0)",
+    "--ring":                       "oklch(0.6200 0.1500 20.0000)",
+    "--sidebar-primary":            "oklch(0.6200 0.1500 20.0000)",
+    "--sidebar-primary-foreground": "oklch(0.9800 0.0200 20.0000)",
+    "--sidebar-ring":               "oklch(0.6200 0.1500 20.0000)",
+    "--chart-1":                    "oklch(0.6000 0.1600 20.0000)",
+  },
+  dark: {
+    "--primary":                    "oklch(0.5000 0.1300 20.0000)",
+    "--primary-foreground":         "oklch(0.9800 0.0200 20.0000)",
+    "--ring":                       "oklch(0.5800 0.1400 20.0000)",
+    "--sidebar-primary":            "oklch(0.5800 0.1400 20.0000)",
+    "--sidebar-primary-foreground": "oklch(1.0000 0 0)",
+    "--sidebar-ring":               "oklch(0.5800 0.1400 20.0000)",
+    "--chart-1":                    "oklch(0.5000 0.1300 20.0000)",
+  },
+},
 ];
 
 export const defaultTheme: ThemeKey = "pink";
