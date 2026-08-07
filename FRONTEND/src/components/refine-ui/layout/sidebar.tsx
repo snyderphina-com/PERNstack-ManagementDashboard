@@ -65,9 +65,9 @@ export function Sidebar() {
           />
         ))}
       </ShadcnSidebarContent>
-<AccentColorPicker />
-      <ShadcnSidebarContent>
 
+      <ShadcnSidebarContent>
+<AccentColorPicker />
       </ShadcnSidebarContent>
 
       {/* ── Appearance / Accent picker ── */}
