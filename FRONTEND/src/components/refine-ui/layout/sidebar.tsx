@@ -64,10 +64,7 @@ export function Sidebar() {
             selectedKey={selectedKey}
           />
         ))}
-      </ShadcnSidebarContent>
-
-      <ShadcnSidebarContent>
-<AccentColorPicker />
+        <AccentColorPicker />
       </ShadcnSidebarContent>
 
       {/* ── Appearance / Accent picker ── */}
