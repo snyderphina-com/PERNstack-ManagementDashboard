@@ -31,10 +31,18 @@ import { Button } from "@/components/ui/button";
 import { ChevronRight, ListIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { AccentColorPicker } from "@/components/settings/AccentColorPicker"; // ← ADD THIS IMPORT
+import { authClient } from "@/lib/auth-client";
+
+
+
 
 export function Sidebar() {
   const { open } = useShadcnSidebar();
   const { menuItems, selectedKey } = useMenu();
+
+  const { data: session } = authClient.useSession();
+
+const user = session?.user;
 
   return (
     <ShadcnSidebar collapsible="icon" className={cn("border-none")}>
@@ -67,23 +75,78 @@ export function Sidebar() {
         <AccentColorPicker />
       </ShadcnSidebarContent>
 
-    
-    
-      <ShadcnSidebarFooter
-        className={cn(
-          "border-t",
-          "border-border",
-          "border-r",
-          "pt-2",
-          "pb-2",
-          {
-            "px-3": open,
-            "px-1": !open,
-          }
-        )}
-      >
-        
-      </ShadcnSidebarFooter>
+    <ShadcnSidebarFooter>
+  <SidebarMenu>
+    <SidebarMenuItem>
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <SidebarMenuButton className="h-14">
+            <Avatar className="h-8 w-8">
+              <AvatarImage
+                src={user?.image ?? ""}
+                alt={user?.name ?? "User"}
+              />
+
+              <AvatarFallback>
+                {user?.name?.charAt(0).toUpperCase() ?? "U"}
+              </AvatarFallback>
+            </Avatar>
+
+            <div className="flex flex-col items-start overflow-hidden">
+              <span className="truncate font-medium">
+                {user?.name ?? "Loading..."}
+              </span>
+
+              <span className="truncate text-xs text-muted-foreground">
+                {user?.role ?? "User"}
+              </span>
+            </div>
+          </SidebarMenuButton>
+        </DropdownMenuTrigger>
+
+        <DropdownMenuContent
+          side="top"
+          align="start"
+          className="w-56"
+        >
+          <div className="px-2 py-2">
+            <p className="font-medium">
+              {user?.name}
+            </p>
+
+            <p className="text-xs text-muted-foreground">
+              {user?.email}
+            </p>
+          </div>
+
+          <DropdownMenuSeparator />
+
+          <DropdownMenuItem>
+            <User className="mr-2 h-4 w-4" />
+            Profile
+          </DropdownMenuItem>
+
+          <DropdownMenuItem>
+            <Settings className="mr-2 h-4 w-4" />
+            Settings
+          </DropdownMenuItem>
+
+          <DropdownMenuSeparator />
+
+          <DropdownMenuItem
+            onClick={handleLogout}
+            className="text-red-500"
+          >
+            <LogOut className="mr-2 h-4 w-4" />
+            Logout
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
+    </SidebarMenuItem>
+  </SidebarMenu>
+</ShadcnSidebarFooter>
+
+      
     </ShadcnSidebar>
   );
 }
