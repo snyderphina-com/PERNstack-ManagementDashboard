@@ -60,13 +60,20 @@ export function AccentColorPicker() {
           aria-label="Appearance"
         >
           {/* Swatch circle — acts as the icon slot */}
-          <span
+          {/* <span
             className="flex size-4 shrink-0 items-center justify-center rounded-full border border-border"
             style={{
               backgroundColor: activeTheme?.swatch ?? "var(--primary)",
             }}
             aria-hidden="true"
-          />
+          /> */}
+
+          <span
+  className="flex size-4 shrink-0 items-center justify-center"
+  aria-hidden="true"
+>
+  <Palette className="size-5" />
+</span>
 
           {/* Label — hidden when sidebar is icon-only, same as nav items */}
           <span

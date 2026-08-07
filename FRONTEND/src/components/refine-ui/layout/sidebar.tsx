@@ -67,7 +67,8 @@ export function Sidebar() {
         <AccentColorPicker />
       </ShadcnSidebarContent>
 
-      {/* ── Appearance / Accent picker ── */}
+    
+    
       <ShadcnSidebarFooter
         className={cn(
           "border-t",
