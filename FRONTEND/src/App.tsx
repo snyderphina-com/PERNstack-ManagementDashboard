@@ -2,6 +2,9 @@ import { Authenticated, Refine } from "@refinedev/core";
 import { DevtoolsProvider } from "@refinedev/devtools";
 import { RefineKbar, RefineKbarProvider } from "@refinedev/kbar";
 
+import { useEffect } from "react";
+import { loadSavedTheme } from "@/lib/theme";
+
 import routerProvider, {
   DocumentTitleHandler,
   NavigateToResource,
@@ -43,6 +46,11 @@ import EnrollmentsJoin from "./pages/enrollments/join";
 import EnrollmentConfirm from "./pages/enrollments/confirm";
 
 function App() {
+
+    useEffect(() => {
+    loadSavedTheme();
+  }, []);
+
   return (
     <BrowserRouter>
       <RefineKbarProvider>

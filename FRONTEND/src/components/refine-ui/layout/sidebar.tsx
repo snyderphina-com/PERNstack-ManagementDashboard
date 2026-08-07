@@ -12,6 +12,7 @@ import {
   Sidebar as ShadcnSidebar,
   SidebarContent as ShadcnSidebarContent,
   SidebarHeader as ShadcnSidebarHeader,
+  SidebarFooter as ShadcnSidebarFooter,   // ← ADD THIS IMPORT
   useSidebar as useShadcnSidebar,
   SidebarTrigger as ShadcnSidebarTrigger,
 } from "@/components/ui/sidebar";
@@ -29,6 +30,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { ChevronRight, ListIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { AccentColorPicker } from "@/components/settings/AccentColorPicker"; // ← ADD THIS IMPORT
 
 export function Sidebar() {
   const { open } = useShadcnSidebar();
@@ -63,9 +65,28 @@ export function Sidebar() {
           />
         ))}
       </ShadcnSidebarContent>
+
+      {/* ── Appearance / Accent picker ── */}
+      <ShadcnSidebarFooter
+        className={cn(
+          "border-t",
+          "border-border",
+          "border-r",
+          "pt-2",
+          "pb-2",
+          {
+            "px-3": open,
+            "px-1": !open,
+          }
+        )}
+      >
+        <AccentColorPicker />
+      </ShadcnSidebarFooter>
     </ShadcnSidebar>
   );
 }
+
+// ─── Everything below is UNCHANGED from your original file ───────────────────
 
 type MenuItemProps = {
   item: TreeMenuItem;
@@ -205,7 +226,6 @@ function SidebarItemDropdown({ item, selectedKey }: MenuItemProps) {
 
 function SidebarItemLink({ item, selectedKey }: MenuItemProps) {
   const isSelected = item.key === selectedKey;
-
   return <SidebarButton item={item} isSelected={isSelected} asLink={true} />;
 }
 
@@ -243,9 +263,7 @@ function SidebarHeader() {
           }
         )}
       >
-        <div className="shrink-0">
-        {title.icon}
-        </div>
+        <div className="shrink-0">{title.icon}</div>
         <h2
           className={cn(
             "text-sm",
