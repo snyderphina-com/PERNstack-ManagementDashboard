@@ -1,7 +1,12 @@
 "use client";
 
 import React from "react";
+
+import { LogOutIcon } from "lucide-react";
+
 import {
+   useLogout,
+  useActiveAuthProvider,
   useMenu,
   useLink,
   useRefineOptions,
@@ -32,7 +37,7 @@ import { ChevronRight, ListIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { AccentColorPicker } from "@/components/settings/AccentColorPicker"; // ← ADD THIS IMPORT
 import { authClient } from "@/lib/auth-client";
-
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 
 
@@ -40,9 +45,20 @@ export function Sidebar() {
   const { open } = useShadcnSidebar();
   const { menuItems, selectedKey } = useMenu();
 
-  const { data: session } = authClient.useSession();
+const { mutate: logout, isPending: isLoggingOut } = useLogout();
+const authProvider = useActiveAuthProvider();
 
-const user = session?.user;
+const { data: session } = authClient.useSession();
+
+const user = session?.user as
+  | {
+      name?: string;
+      email?: string;
+      image?: string | null;
+      role?: string;
+    }
+  | undefined;
+
 
   return (
     <ShadcnSidebar collapsible="icon" className={cn("border-none")}>
@@ -75,75 +91,57 @@ const user = session?.user;
         <AccentColorPicker />
       </ShadcnSidebarContent>
 
-    <ShadcnSidebarFooter>
-  <SidebarMenu>
-    <SidebarMenuItem>
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <SidebarMenuButton className="h-14">
-            <Avatar className="h-8 w-8">
-              <AvatarImage
-                src={user?.image ?? ""}
-                alt={user?.name ?? "User"}
-              />
+   <ShadcnSidebarFooter>
+  <DropdownMenu>
+    <DropdownMenuTrigger asChild>
+      <button className="flex w-full items-center gap-3 rounded-md p-2 hover:bg-accent">
+        <Avatar className="h-8 w-8">
+          <AvatarImage
+            src={user?.image ?? ""}
+            alt={user?.name ?? "User"}
+          />
 
-              <AvatarFallback>
-                {user?.name?.charAt(0).toUpperCase() ?? "U"}
-              </AvatarFallback>
-            </Avatar>
+          <AvatarFallback>
+            {user?.name?.charAt(0).toUpperCase() ?? "U"}
+          </AvatarFallback>
+        </Avatar>
 
-            <div className="flex flex-col items-start overflow-hidden">
-              <span className="truncate font-medium">
-                {user?.name ?? "Loading..."}
-              </span>
+        <div className="flex flex-col items-start overflow-hidden">
+          <span className="truncate font-medium">
+            {user?.name ?? "User"}
+          </span>
 
-              <span className="truncate text-xs text-muted-foreground">
-                {user?.role ?? "User"}
-              </span>
-            </div>
-          </SidebarMenuButton>
-        </DropdownMenuTrigger>
+          <span className="truncate text-xs text-muted-foreground">
+            {user?.role ?? "Account"}
+          </span>
+        </div>
+      </button>
+    </DropdownMenuTrigger>
 
-        <DropdownMenuContent
-          side="top"
-          align="start"
-          className="w-56"
-        >
-          <div className="px-2 py-2">
-            <p className="font-medium">
-              {user?.name}
-            </p>
+    <DropdownMenuContent side="top" align="start" className="w-56">
+      <div className="px-2 py-2">
+        <p className="font-medium">{user?.name}</p>
+        <p className="text-xs text-muted-foreground">
+          {user?.email}
+        </p>
+      </div>
 
-            <p className="text-xs text-muted-foreground">
-              {user?.email}
-            </p>
-          </div>
+      <DropdownMenuItem>
+        Profile
+      </DropdownMenuItem>
 
-          <DropdownMenuSeparator />
+      <DropdownMenuItem>
+        Settings
+      </DropdownMenuItem>
 
-          <DropdownMenuItem>
-            <User className="mr-2 h-4 w-4" />
-            Profile
-          </DropdownMenuItem>
-
-          <DropdownMenuItem>
-            <Settings className="mr-2 h-4 w-4" />
-            Settings
-          </DropdownMenuItem>
-
-          <DropdownMenuSeparator />
-
-          <DropdownMenuItem
-            onClick={handleLogout}
-            className="text-red-500"
-          >
-            <LogOut className="mr-2 h-4 w-4" />
-            Logout
-          </DropdownMenuItem>
-        </DropdownMenuContent>
-      </DropdownMenu>
-    </SidebarMenuItem>
-  </SidebarMenu>
+      <DropdownMenuItem onClick={() => logout()}>
+        <LogOutIcon className="mr-2 h-4 w-4 text-destructive" />
+        <span className="text-destructive">
+          {isLoggingOut ? "Logging out..." : "Logout"}
+        </span>
+      </DropdownMenuItem>
+    </DropdownMenuContent>
+  </DropdownMenu>
 </ShadcnSidebarFooter>
 
       
