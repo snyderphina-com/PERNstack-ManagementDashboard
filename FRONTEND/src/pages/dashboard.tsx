@@ -37,7 +37,12 @@ type ClassListItem = {
   };
 };
 
-const roleColors = ["#f97316", "#0ea5e9", "#22c55e", "#a855f7"];
+const roleColors = [
+  "var(--chart-1)",
+  "var(--chart-2)",
+  "var(--chart-3)",
+  "var(--chart-4)",
+];
 
 const Dashboard = () => {
   const Link = useLink();
@@ -312,7 +317,7 @@ const Dashboard = () => {
                   <Tooltip />
                   <Bar
                     dataKey="totalSubjects"
-                    fill="#f97316"
+                    fill="var(--chart-1)"
                     radius={[6, 6, 0, 0]}
                   />
                 </BarChart>
@@ -332,7 +337,7 @@ const Dashboard = () => {
                   <Tooltip />
                   <Bar
                     dataKey="totalClasses"
-                    fill="#0ea5e9"
+                    fill="var(--chart-2)"
                     radius={[6, 6, 0, 0]}
                   />
                 </BarChart>
