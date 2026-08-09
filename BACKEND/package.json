@@ -23,6 +23,7 @@
     "@neondatabase/serverless": "^1.0.2",
     "apminsight": "^5.5.1",
     "better-auth": "^1.4.10",
+    "cloudinary": "^2.10.0",
     "cors": "^2.8.6",
     "dotenv": "^17.2.3",
     "drizzle-orm": "^0.45.1",
