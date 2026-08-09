@@ -1,3 +1,4 @@
+
 export type Subject = {
   id: number;
   name: string;
@@ -71,6 +72,9 @@ export enum UserRole {
   ADMIN = "admin",
 }
 
+export type Role   = "student" | "teacher" | "admin";
+export type Status = "active" | "pending" | "suspended";
+
 export type User = {
   id: string;
   createdAt: string;
@@ -81,6 +85,16 @@ export type User = {
   image?: string;
   imageCldPubId?: string;
   department?: string;
+  emailVerified:     boolean;
+
+  // Student fields
+  institution?:      string | null;
+  studentId?:        string | null;
+
+  // Teacher fields
+  subject?:          string | null;
+  yearsOfExperience?: number | null;
+  qualification?:    string | null;
 };
 
 export type Schedule = {
@@ -119,4 +133,23 @@ export type SignUpPayload = {
   image?: string;
   imageCldPubId?: string;
   role: UserRole;
+// Student
+  institution?:      string;
+  studentId?:        string;
+
+  // Teacher
+  subject?:          string;
+  yearsOfExperience?: number;
+  qualification?:    string;
+
+  // Admin
+  adminInviteCode?:  string;
+
+
 };
+
+
+export interface Permission {
+  action:   string;
+  resource: string;
+}

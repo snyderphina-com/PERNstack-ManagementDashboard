@@ -1,6 +1,7 @@
 import type { AuthProvider } from "@refinedev/core";
 import { User, SignUpPayload } from "@/types";
 import { authClient } from "@/lib/auth-client";
+import { ROLE_DASHBOARD } from "@/auth/roles";
 
 export const authProvider: AuthProvider = {
   register: async ({
@@ -10,6 +11,15 @@ export const authProvider: AuthProvider = {
     role,
     image,
     imageCldPubId,
+    // Student
+    institution,
+    studentId,
+    // Teacher
+    subject,
+    yearsOfExperience,
+    qualification,
+    // Admin
+    adminInviteCode,
   }: SignUpPayload) => {
     try {
       const { data, error } = await authClient.signUp.email({
@@ -19,169 +29,169 @@ export const authProvider: AuthProvider = {
         image,
         role,
         imageCldPubId,
-      } as SignUpPayload);
+        // Better Auth passes additionalFields through
+        institution,
+        studentId,
+        subject,
+        yearsOfExperience,
+        qualification,
+        adminInviteCode,
+      } as any);
 
       if (error) {
         return {
           success: false,
           error: {
-            name: "Registration failed",
-            message:
-              error?.message || "Unable to create account. Please try again.",
+            name:    "Registration failed",
+            message: error?.message || "Unable to create account. Please try again.",
           },
         };
       }
 
-      // Store user data
-      localStorage.setItem("user", JSON.stringify(data.user));
+      const user = data.user as User;
+
+      // Check if admin is pending
+      if (user.role === "admin" && user.status === "pending") {
+        localStorage.setItem("user", JSON.stringify(user));
+        return {
+          success:    true,
+          redirectTo: "/pending-approval",
+        };
+      }
+
+      localStorage.setItem("user", JSON.stringify(user));
 
       return {
-        success: true,
-        redirectTo: "/",
+        success:    true,
+        redirectTo: ROLE_DASHBOARD[user.role] ?? "/",
       };
     } catch (error) {
       console.error("Register error:", error);
       return {
         success: false,
         error: {
-          name: "Registration failed",
+          name:    "Registration failed",
           message: "Unable to create account. Please try again.",
         },
       };
     }
   },
+
   login: async ({ email, password, providerName }) => {
+    if (providerName) {
+      return {
+        success: false,
+        error: {
+          name:    "Provider login not configured",
+          message: "Google/GitHub login is not configured yet.",
+        },
+      };
+    }
 
-  console.log("authProvider params:", { email, password, providerName });
-  
-if (providerName) {
-  return {
-    success: false,
-    error: {
-      name: "Provider login not configured",
-      message: "Google/GitHub login is not configured yet.",
-    },
-  };
-}
-
-if (!email || !password) {
-  return {
-    success: false,
-    error: {
-      name: "Missing credentials",
-      message: "Email and password are required.",
-    },
-  };
-}
-
+    if (!email || !password) {
+      return {
+        success: false,
+        error: {
+          name:    "Missing credentials",
+          message: "Email and password are required.",
+        },
+      };
+    }
 
     try {
       const { data, error } = await authClient.signIn.email({
-        email: email,
-        password: password,
+        email,
+        password,
       });
 
       if (error) {
-        console.error("Login error from auth client:", error);
         return {
           success: false,
           error: {
-            name: "Login failed",
+            name:    "Login failed",
             message: error?.message || "Please try again later.",
           },
         };
       }
 
-      // Store user data
-      localStorage.setItem("user", JSON.stringify(data.user));
+      const user = data.user as User;
+
+      if (user.role === "admin" && user.status === "pending") {
+        localStorage.setItem("user", JSON.stringify(user));
+        return {
+          success:    true,
+          redirectTo: "/pending-approval",
+        };
+      }
+
+      localStorage.setItem("user", JSON.stringify(user));
 
       return {
-        success: true,
-        redirectTo: "/",
+        success:    true,
+        redirectTo: ROLE_DASHBOARD[user.role] ?? "/",
       };
     } catch (error) {
       console.error("Login exception:", error);
       return {
         success: false,
         error: {
-          name: "Login failed",
+          name:    "Login failed",
           message: "Please try again later.",
         },
       };
     }
   },
+
   logout: async () => {
     const { error } = await authClient.signOut();
-
-    if (error) {
-      console.error("Logout error:", error);
-      return {
-        success: false,
-        error: {
-          name: "Logout failed",
-          message: "Unable to log out. Please try again.",
-        },
-      };
-    }
-
+    if (error) console.error("Logout error:", error);
     localStorage.removeItem("user");
-
-    return {
-      success: true,
-      redirectTo: "/login",
-    };
+    return { success: true, redirectTo: "/login" };
   },
-  onError: async (error) => {
-    if (error.response?.status === 401) {
-      return {
-        logout: true,
-      };
-    }
 
+  onError: async (error) => {
+    if (error.response?.status === 401) return { logout: true };
     return { error };
   },
+
   check: async () => {
     const user = localStorage.getItem("user");
-
-    if (user) {
-      return {
-        authenticated: true,
-      };
-    }
-
+    if (user) return { authenticated: true };
     return {
       authenticated: false,
-      logout: true,
-      redirectTo: "/login",
+      logout:        true,
+      redirectTo:    "/login",
       error: {
-        name: "Unauthorized",
+        name:    "Unauthorized",
         message: "Check failed",
       },
     };
   },
+
   getPermissions: async () => {
     const user = localStorage.getItem("user");
-
     if (!user) return null;
-    const parsedUser: User = JSON.parse(user);
-
-    return {
-      role: parsedUser.role,
-    };
+    const parsed: User = JSON.parse(user);
+    return { role: parsed.role, status: parsed.status };
   },
+
   getIdentity: async () => {
     const user = localStorage.getItem("user");
-
     if (!user) return null;
-    const parsedUser: User = JSON.parse(user);
-
+    const parsed: User = JSON.parse(user);
     return {
-      id: parsedUser.id,
-      name: parsedUser.name,
-      email: parsedUser.email,
-      image: parsedUser.image,
-      role: parsedUser.role,
-      imageCldPubId: parsedUser.imageCldPubId,
+      id:                parsed.id,
+      name:              parsed.name,
+      email:             parsed.email,
+      image:             parsed.image,
+      role:              parsed.role,
+      status:            parsed.status,
+      imageCldPubId:     parsed.imageCldPubId,
+      institution:       parsed.institution,
+      studentId:         parsed.studentId,
+      subject:           parsed.subject,
+      yearsOfExperience: parsed.yearsOfExperience,
+      qualification:     parsed.qualification,
     };
   },
 };
