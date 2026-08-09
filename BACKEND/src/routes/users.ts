@@ -1,6 +1,7 @@
 import express from "express";
 import { and, desc, eq, ilike, or, sql, getTableColumns } from "drizzle-orm";
 
+import { requireRole } from "../middleware/requireRole.js";
 import { db } from "../db/index.js";
 import { classes, departments, enrollments, subjects, user } from "../db/schema/index.js";
 
@@ -310,5 +311,62 @@ router.get("/:id/subjects", async (req, res) => {
     res.status(500).json({ error: "Failed to fetch user subjects" });
   }
 });
+
+
+
+router.get("/:id", requireRole(["admin", "teacher"]), async (req, res) => {
+  try {
+    const { id } = req.params;
+    const [found] = await db
+      .select()
+      .from(user)
+      .where(eq(user.id, id))
+      .limit(1);
+
+    if (!found) {
+      res.status(404).json({ error: "User not found." });
+      return;
+    }
+
+    res.json({ data: found });
+  } catch (err) {
+    console.error("GET /users/:id error:", err);
+    res.status(500).json({ error: "Failed to fetch user." });
+  }
+});
+
+/**
+ * PATCH /api/users/:id/status
+ * Admin only — approve or suspend a user.
+ */
+router.patch(
+  "/:id/status",
+  requireRole(["admin"]),
+  async (req, res) => {
+    try {
+      const { id } = req.params;
+      const { status } = req.body as {
+        status: "active" | "pending" | "suspended";
+      };
+
+      if (!["active", "pending", "suspended"].includes(status)) {
+        res.status(400).json({ error: "Invalid status value." });
+        return;
+      }
+
+      const [updated] = await db
+        .update(user)
+        .set({ status, updatedAt: new Date() })
+        .where(eq(user.id, id))
+        .returning();
+
+      res.json({ data: updated });
+    } catch (err) {
+      console.error("PATCH /users/:id/status error:", err);
+      res.status(500).json({ error: "Failed to update user status." });
+    }
+  }
+);
+
 
 export default router;

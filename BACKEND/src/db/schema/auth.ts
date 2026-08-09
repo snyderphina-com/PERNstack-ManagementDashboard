@@ -2,6 +2,7 @@ import { relations } from "drizzle-orm";
 import {
   boolean,
   index,
+  integer,
   pgEnum,
   pgTable,
   text,
@@ -17,20 +18,47 @@ const timestamps = {
     .notNull(),
 };
 
+// ── Enums ──────────────────────────────────────────────────────────
 export const roleEnum = pgEnum("role", ["student", "teacher", "admin"]);
 
+export const statusEnum = pgEnum("status", [
+  "active",
+  "pending",
+  "suspended",
+]);
+
+// ── User ───────────────────────────────────────────────────────────
 export const user = pgTable("user", {
   id: text("id").primaryKey(),
   name: text("name").notNull(),
   email: text("email").notNull(),
   emailVerified: boolean("email_verified").notNull(),
+
+  // Core auth fields
   image: text("image"),
   role: roleEnum("role").notNull().default("student"),
   imageCldPubId: text("image_cld_pub_id"),
 
+  // Account status
+  // admin accounts start as "pending" until approved
+  status: statusEnum("status").notNull().default("active"),
+
+  // Student-specific
+  institution: text("institution"),
+  studentId: text("student_id"),
+
+  // Teacher-specific
+  subject: text("subject"),
+  yearsOfExperience: integer("years_of_experience"),
+  qualification: text("qualification"),
+
+  // Admin-specific (we store the code used so it can be audited)
+  adminInviteCodeUsed: text("admin_invite_code_used"),
+
   ...timestamps,
 });
 
+// ── Session ────────────────────────────────────────────────────────
 export const session = pgTable(
   "session",
   {
@@ -42,7 +70,6 @@ export const session = pgTable(
     expiresAt: timestamp("expires_at").notNull(),
     ipAddress: text("ip_address"),
     userAgent: text("user_agent"),
-
     ...timestamps,
   },
   (table) => ({
@@ -51,6 +78,7 @@ export const session = pgTable(
   })
 );
 
+// ── Account ────────────────────────────────────────────────────────
 export const account = pgTable(
   "account",
   {
@@ -67,7 +95,6 @@ export const account = pgTable(
     scope: text("scope"),
     idToken: text("id_token"),
     password: text("password"),
-
     ...timestamps,
   },
   (table) => ({
@@ -79,6 +106,7 @@ export const account = pgTable(
   })
 );
 
+// ── Verification ───────────────────────────────────────────────────
 export const verification = pgTable(
   "verification",
   {
@@ -86,7 +114,6 @@ export const verification = pgTable(
     identifier: text("identifier").notNull(),
     value: text("value").notNull(),
     expiresAt: timestamp("expires_at").notNull(),
-
     ...timestamps,
   },
   (table) => ({
@@ -94,33 +121,26 @@ export const verification = pgTable(
   })
 );
 
+// ── Relations ──────────────────────────────────────────────────────
 export const usersRelations = relations(user, ({ many }) => ({
   sessions: many(session),
   accounts: many(account),
 }));
 
 export const sessionsRelations = relations(session, ({ one }) => ({
-  user: one(user, {
-    fields: [session.userId],
-    references: [user.id],
-  }),
+  user: one(user, { fields: [session.userId], references: [user.id] }),
 }));
 
 export const accountsRelations = relations(account, ({ one }) => ({
-  user: one(user, {
-    fields: [account.userId],
-    references: [user.id],
-  }),
+  user: one(user, { fields: [account.userId], references: [user.id] }),
 }));
 
+// ── Inferred Types ─────────────────────────────────────────────────
 export type User = typeof user.$inferSelect;
 export type NewUser = typeof user.$inferInsert;
-
 export type Session = typeof session.$inferSelect;
 export type NewSession = typeof session.$inferInsert;
-
 export type Account = typeof account.$inferSelect;
 export type NewAccount = typeof account.$inferInsert;
-
 export type Verification = typeof verification.$inferSelect;
 export type NewVerification = typeof verification.$inferInsert;
