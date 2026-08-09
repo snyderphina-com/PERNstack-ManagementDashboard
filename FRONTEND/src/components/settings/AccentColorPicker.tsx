@@ -93,8 +93,8 @@ export function AccentColorPicker() {
       </PopoverTrigger>
 
       <PopoverContent
-        side="right"
-        align="end"
+        side="bottom"
+        align="start"
         sideOffset={8}
         className="w-52 p-3"
         // Keep popover inside the sidebar z-stack
