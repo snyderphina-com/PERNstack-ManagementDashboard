@@ -24,7 +24,7 @@ import { TeacherFields }   from "@/components/auth/TeacherFields";
 import { AdminFields }     from "@/components/auth/AdminFields";
 import { ProfileUploader } from "@/components/auth/ProfileUploader";
 
-import type { Role, SignUpPayload } from "@/types";
+import type { UserRole, SignUpPayload } from "@/types";
 
 // ── Zod Schema ────────────────────────────────────────────────────
 const registerSchema = z
@@ -127,7 +127,7 @@ export function Register() {
     },
   });
 
-  const selectedRole = watch("role") as Role;
+  const selectedRole = watch("role") as UserRole;
 
   // ── Step navigation ──────────────────────────────────────────────
   const goNext = async () => {

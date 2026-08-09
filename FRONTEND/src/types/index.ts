@@ -66,13 +66,7 @@ export interface UploadWidgetProps {
   disabled?: boolean;
 }
 
-export enum UserRole {
-  STUDENT = "student",
-  TEACHER = "teacher",
-  ADMIN = "admin",
-}
-
-export type Role   = "student" | "teacher" | "admin";
+export type UserRole   = "student" | "teacher" | "admin";
 export type Status = "active" | "pending" | "suspended";
 
 export type User = {
@@ -144,7 +138,6 @@ export type SignUpPayload = {
 
   // Admin
   adminInviteCode?:  string;
-
 
 };
 

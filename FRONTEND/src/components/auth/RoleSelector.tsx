@@ -1,9 +1,9 @@
 import { GraduationCap, BookOpen, ShieldCheck } from "lucide-react";
 import { cn } from "@/lib/utils";
-import type { Role } from "@/types";
+import type { UserRole } from "@/types";
 
 interface RoleOption {
-  value:       Role;
+  value:       UserRole;
   label:       string;
   description: string;
   icon:        React.ElementType;
@@ -39,8 +39,8 @@ const ROLE_OPTIONS: RoleOption[] = [
 ];
 
 interface RoleSelectorProps {
-  value:    Role | null;
-  onChange: (role: Role) => void;
+  value:    UserRole | null;
+  onChange: (role: UserRole) => void;
   disabled?: boolean;
 }
 
