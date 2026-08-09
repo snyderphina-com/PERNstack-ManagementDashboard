@@ -313,10 +313,43 @@ router.get("/:id/subjects", async (req, res) => {
 });
 
 
+router.get("/", requireRole(["admin"]), async (_req, res) => {
+  try {
+    const users = await db
+      .select({
+        id:                user.id,
+        name:              user.name,
+        email:             user.email,
+        role:              user.role,
+        status:            user.status,
+        image:             user.image,
+        imageCldPubId:     user.imageCldPubId,
+        institution:       user.institution,
+        studentId:         user.studentId,
+        subject:           user.subject,
+        yearsOfExperience: user.yearsOfExperience,
+        qualification:     user.qualification,
+        createdAt:         user.createdAt,
+      })
+      .from(user);
+
+    res.json({ data: users });
+  } catch (err) {
+    console.error("GET /users error:", err);
+    res.status(500).json({ error: "Failed to fetch users." });
+  }
+});
+
 
 router.get("/:id", requireRole(["admin", "teacher"]), async (req, res) => {
   try {
     const { id } = req.params;
+
+    if (!id || Array.isArray(id)) {
+      res.status(400).json({ error: "Invalid user ID." });
+      return;
+    }
+
     const [found] = await db
       .select()
       .from(user)
@@ -345,6 +378,12 @@ router.patch(
   async (req, res) => {
     try {
       const { id } = req.params;
+
+    if (!id || Array.isArray(id)) {
+      res.status(400).json({ error: "Invalid user ID." });
+      return;
+    }
+
       const { status } = req.body as {
         status: "active" | "pending" | "suspended";
       };

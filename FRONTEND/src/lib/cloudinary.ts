@@ -23,7 +23,7 @@ export const bannerPhoto = (imageCldPubId: string, name: string) => {
       .image(imageCldPubId)
 
       .resize(
-        fill().width(1200).height(297) // Aspect ratio 5:1
+        fill().width(1200).height(350) // Aspect ratio 5:1
       )
       // Optimize for web
       .delivery(format("auto"))
@@ -32,7 +32,7 @@ export const bannerPhoto = (imageCldPubId: string, name: string) => {
       // Text overlay with name
       .overlay(
         source(
-          text(name, new TextStyle("roboto", 100).fontWeight("bold")).textColor(
+          text(name, new TextStyle("roboto", 50).fontWeight("bold")).textColor(
             "white"
           )
         ).position(
