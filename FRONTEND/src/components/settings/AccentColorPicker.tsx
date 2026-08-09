@@ -26,12 +26,12 @@ export function AccentColorPicker() {
   const [open, setOpen] = React.useState(false);
 
   const { open: sidebarOpen } = useShadcnSidebar();
-  const { mode } = useTheme();
+  const { theme } = useTheme();
 
   // Re-apply correct light/dark vars whenever color scheme toggles
   React.useEffect(() => {
     reapplyThemeForColorScheme(activeKey);
-  }, [mode, activeKey]);
+  }, [theme, activeKey]);
 
   function handleSelect(key: ThemeKey) {
     setActiveKey(key);
@@ -40,7 +40,7 @@ export function AccentColorPicker() {
     setOpen(false);
   }
 
-  const activeTheme = themes.find((t) => t.key === activeKey);
+  //const activeTheme = themes.find((t) => t.key === activeKey);
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
