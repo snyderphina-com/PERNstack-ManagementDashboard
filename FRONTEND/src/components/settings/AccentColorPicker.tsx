@@ -96,6 +96,7 @@ export function AccentColorPicker() {
         side="bottom"
         align="start"
         sideOffset={8}
+        avoidCollisions={false}
         className="w-52 p-3"
         // Keep popover inside the sidebar z-stack
         style={{ zIndex: 50 }}
