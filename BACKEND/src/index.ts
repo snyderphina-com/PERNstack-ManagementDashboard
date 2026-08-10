@@ -11,7 +11,8 @@ import usersRouter       from "./routes/users.js";
 import classesRouter     from "./routes/classes.js";
 import departmentsRouter from "./routes/departments.js";
 import enrollmentsRouter from "./routes/enrollments.js";
-import uploadRouter      from "./routes/upload.js";          // ← NEW
+import uploadRouter      from "./routes/upload.js";      
+import notificationsRouter from "./routes/notifications.js";  
 import securityMiddleware from "./middleware/security.js";
 
 const app  = express();
@@ -39,7 +40,8 @@ app.use("/api/users",       usersRouter);
 app.use("/api/classes",     classesRouter);
 app.use("/api/departments", departmentsRouter);
 app.use("/api/enrollments", enrollmentsRouter);
-app.use("/api/upload",      uploadRouter);                   // ← NEW
+app.use("/api/upload",      uploadRouter);  
+app.use("/api/notifications", notificationsRouter);                 // ← NEW
 
 app.get("/", (_req, res) => {
   res.send("Hello Welcome to the Classroom Api");

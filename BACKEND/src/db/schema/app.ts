@@ -1,5 +1,6 @@
 import { relations } from "drizzle-orm";
 import {
+  boolean,
   integer,
   jsonb,
   index,
@@ -135,6 +136,30 @@ export const enrollmentsRelations = relations(enrollments, ({ one }) => ({
     references: [classes.id],
   }),
 }));
+
+
+
+ /* adminNotifications
+ *
+ * Lightweight in-app notification store.
+ * Created server-side when events that admins need to act on occur
+ * (e.g. a new pending admin account).
+ *
+ * Admins poll GET /api/notifications to display these.
+ */
+export const adminNotifications = pgTable("admin_notifications", {
+  id:          text("id").primaryKey(),
+  type:        text("type").notNull(),          // e.g. "admin_approval_request"
+  title:       text("title").notNull(),
+  message:     text("message").notNull(),
+  targetRole:  text("target_role").notNull(),   // which role should see this
+  referenceId: text("reference_id"),            // user id of the requester
+  read:        boolean("read").notNull().default(false),
+  createdAt:   timestamp("created_at").defaultNow().notNull(),
+});
+
+export type AdminNotification    = typeof adminNotifications.$inferSelect;
+export type NewAdminNotification = typeof adminNotifications.$inferInsert;
 
 export type Department = typeof departments.$inferSelect;
 export type NewDepartment = typeof departments.$inferInsert;

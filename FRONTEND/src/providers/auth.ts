@@ -1,72 +1,51 @@
 import type { AuthProvider } from "@refinedev/core";
-import { User, SignUpPayload } from "@/types";
+import type { User, SignUpPayload } from "@/types";
 import { authClient } from "@/lib/auth-client";
 import { ROLE_DASHBOARD } from "@/auth/roles";
 
 export const authProvider: AuthProvider = {
-  register: async ({
-    email,
-    password,
-    name,
-    role,
-    image,
-    imageCldPubId,
-    // Student
-    institution,
-    studentId,
-    // Teacher
-    subject,
-    yearsOfExperience,
-    qualification,
-    // Admin
-    adminInviteCode,
-  }: SignUpPayload) => {
+  register: async (params: SignUpPayload) => {
     try {
-      const { data, error } = await authClient.signUp.email({
-        name,
-        email,
-        password,
-        image,
-        role,
-        imageCldPubId,
-        // Better Auth passes additionalFields through
-        institution,
-        studentId,
-        subject,
-        yearsOfExperience,
-        qualification,
-        adminInviteCode,
-      } as any);
+      const { data, error } = await authClient.signUp.email(
+        params as Parameters<typeof authClient.signUp.email>[0]
+      );
 
       if (error) {
         return {
           success: false,
           error: {
             name:    "Registration failed",
-            message: error?.message || "Unable to create account. Please try again.",
+            message: error.message ?? "Unable to create account.",
           },
         };
       }
 
-      const user = data.user as User;
-
-      // Check if admin is pending
-      if (user.role === "admin" && user.status === "pending") {
-        localStorage.setItem("user", JSON.stringify(user));
+      if (!data?.user) {
         return {
-          success:    true,
-          redirectTo: "/pending-approval",
+          success: false,
+          error: {
+            name:    "Registration failed",
+            message: "No user data returned from server.",
+          },
         };
       }
 
+      // Better Auth returns additionalFields on the user object
+      const user = data.user as User & Record<string, unknown>;
+
       localStorage.setItem("user", JSON.stringify(user));
+
+      // Admin accounts that lacked a valid invite code are "pending"
+      if (user.role === "admin" && (user.status as string) === "pending") {
+        return { success: true, redirectTo: "/pending-approval" };
+      }
 
       return {
         success:    true,
         redirectTo: ROLE_DASHBOARD[user.role] ?? "/",
       };
-    } catch (error) {
-      console.error("Register error:", error);
+    } catch (err) {
+      console.error("Register error:", err);
       return {
         success: false,
         error: {
@@ -91,60 +70,49 @@ export const authProvider: AuthProvider = {
     if (!email || !password) {
       return {
         success: false,
-        error: {
-          name:    "Missing credentials",
-          message: "Email and password are required.",
-        },
+        error: { name: "Missing credentials", message: "Email and password are required." },
       };
     }
 
     try {
-      const { data, error } = await authClient.signIn.email({
-        email,
-        password,
-      });
+      const { data, error } = await authClient.signIn.email({ email, password });
 
       if (error) {
         return {
           success: false,
-          error: {
-            name:    "Login failed",
-            message: error?.message || "Please try again later.",
-          },
+          error: { name: "Login failed", message: error.message ?? "Please try again." },
         };
       }
 
-      const user = data.user as User;
-
-      if (user.role === "admin" && user.status === "pending") {
-        localStorage.setItem("user", JSON.stringify(user));
+      if (!data?.user) {
         return {
-          success:    true,
-          redirectTo: "/pending-approval",
+          success: false,
+          error: { name: "Login failed", message: "No user data returned." },
         };
       }
 
+      const user = data.user as User & Record<string, unknown>;
       localStorage.setItem("user", JSON.stringify(user));
+
+      if (user.role === "admin" && (user.status as string) === "pending") {
+        return { success: true, redirectTo: "/pending-approval" };
+      }
 
       return {
         success:    true,
         redirectTo: ROLE_DASHBOARD[user.role] ?? "/",
       };
-    } catch (error) {
-      console.error("Login exception:", error);
+    } catch (err) {
+      console.error("Login exception:", err);
       return {
         success: false,
-        error: {
-          name:    "Login failed",
-          message: "Please try again later.",
-        },
+        error: { name: "Login failed", message: "Please try again later." },
       };
     }
   },
 
   logout: async () => {
-    const { error } = await authClient.signOut();
-    if (error) console.error("Logout error:", error);
+    await authClient.signOut().catch(console.error);
     localStorage.removeItem("user");
     return { success: true, redirectTo: "/login" };
   },
@@ -155,43 +123,42 @@ export const authProvider: AuthProvider = {
   },
 
   check: async () => {
-    const user = localStorage.getItem("user");
-    if (user) return { authenticated: true };
-    return {
-      authenticated: false,
-      logout:        true,
-      redirectTo:    "/login",
-      error: {
-        name:    "Unauthorized",
-        message: "Check failed",
-      },
-    };
+    const raw = localStorage.getItem("user");
+    if (!raw) {
+      return {
+        authenticated: false,
+        logout:        true,
+        redirectTo:    "/login",
+        error: { name: "Unauthorized", message: "Not logged in." },
+      };
+    }
+    return { authenticated: true };
   },
 
   getPermissions: async () => {
-    const user = localStorage.getItem("user");
-    if (!user) return null;
-    const parsed: User = JSON.parse(user);
-    return { role: parsed.role, status: parsed.status };
+    const raw = localStorage.getItem("user");
+    if (!raw) return null;
+    const u: User = JSON.parse(raw);
+    return { role: u.role, status: u.status };
   },
 
   getIdentity: async () => {
-    const user = localStorage.getItem("user");
-    if (!user) return null;
-    const parsed: User = JSON.parse(user);
+    const raw = localStorage.getItem("user");
+    if (!raw) return null;
+    const u: User = JSON.parse(raw);
     return {
-      id:                parsed.id,
-      name:              parsed.name,
-      email:             parsed.email,
-      image:             parsed.image,
-      role:              parsed.role,
-      status:            parsed.status,
-      imageCldPubId:     parsed.imageCldPubId,
-      institution:       parsed.institution,
-      studentId:         parsed.studentId,
-      subject:           parsed.subject,
-      yearsOfExperience: parsed.yearsOfExperience,
-      qualification:     parsed.qualification,
+      id:                u.id,
+      name:              u.name,
+      email:             u.email,
+      image:             u.image,
+      role:              u.role,
+      status:            u.status,
+      imageCldPubId:     u.imageCldPubId,
+      institution:       u.institution,
+      studentId:         u.studentId,
+      subject:           u.subject,
+      yearsOfExperience: u.yearsOfExperience,
+      qualification:     u.qualification,
     };
   },
 };
