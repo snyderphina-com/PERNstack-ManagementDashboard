@@ -89,6 +89,7 @@ export type User = {
   subject?:          string | null;
   yearsOfExperience?: number | null;
   qualification?:    string | null;
+  adminInviteCodeUsed?: string | null;
 };
 
 export type Schedule = {
@@ -146,3 +147,26 @@ export interface Permission {
   action:   string;
   resource: string;
 }
+
+// ── Admin Invitation types ─────────────────────────────────────────
+export type InvitationStatus = "active" | "expired" | "used";
+
+export interface AdminInvitation {
+  id:            string;
+  createdBy:     string;
+  createdByName: string | null;
+  expiresAt:     string;
+  usedAt:        string | null;
+  usedBy:        string | null;
+  usedByEmail:   string | null;
+  createdAt:     string;
+}
+
+export function getInvitationStatus(inv: AdminInvitation): InvitationStatus {
+  if (inv.usedAt !== null) return "used";
+  if (new Date(inv.expiresAt) <= new Date()) return "expired";
+  return "active";
+}
+
+
+

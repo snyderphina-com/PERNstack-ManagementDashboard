@@ -1,4 +1,4 @@
-import type { Role } from "@/types";
+import type { UserRole } from "@/types";
 
 export type PermissionKey =
   // Student
@@ -17,7 +17,7 @@ export type PermissionKey =
   | "departments:manage"
   | "subjects:manage";
 
-const ROLE_PERMISSIONS: Record<Role, PermissionKey[]> = {
+const ROLE_PERMISSIONS: Record<UserRole, PermissionKey[]> = {
   student: [
     "courses:view",
     "assignments:submit",
@@ -48,13 +48,13 @@ const ROLE_PERMISSIONS: Record<Role, PermissionKey[]> = {
 };
 
 export function hasPermission(
-  role: Role | undefined | null,
+  role: UserRole | undefined | null,
   permission: PermissionKey
 ): boolean {
   if (!role) return false;
   return ROLE_PERMISSIONS[role]?.includes(permission) ?? false;
 }
 
-export function getPermissions(role: Role): PermissionKey[] {
+export function getPermissions(role: UserRole): PermissionKey[] {
   return ROLE_PERMISSIONS[role] ?? [];
 }

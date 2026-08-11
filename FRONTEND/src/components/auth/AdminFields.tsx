@@ -4,6 +4,7 @@ import { Label }  from "@/components/ui/label";
 import { Input }  from "@/components/ui/input";
 import { cn }     from "@/lib/utils";
 import { Info }   from "lucide-react";
+import { ShieldAlert } from "lucide-react";
 
 interface AdminFieldsProps {
   register: UseFormRegister<RegisterFormValues>;
@@ -21,7 +22,11 @@ export function AdminFields({ register, errors, disabled }: AdminFieldsProps) {
           Admin accounts require an invite code. Without a valid code your
           account will be created with <strong>pending</strong> status and must
           be approved by an existing administrator.
-        </p>
+        </p>   <p className="text-xs text-amber-700/80 dark:text-amber-300/80 leading-snug">
+            Admin accounts can only be created with a valid invitation code
+            issued by an existing administrator. The code is single-use and
+            expires after 7 days.
+          </p>
       </div>
 
       {/* Invite code */}
@@ -37,6 +42,7 @@ export function AdminFields({ register, errors, disabled }: AdminFieldsProps) {
             errors.adminInviteCode && "border-destructive"
           )}
           autoComplete="off"
+          spellCheck={false}
         />
         {errors.adminInviteCode && (
           <p className="text-xs text-destructive">
