@@ -9,6 +9,7 @@ import {
   text,
   timestamp,
   varchar,
+  uniqueIndex,
 } from "drizzle-orm/pg-core";
 import { user } from "./auth.js";
 
@@ -157,6 +158,42 @@ export const adminNotifications = pgTable("admin_notifications", {
   read:        boolean("read").notNull().default(false),
   createdAt:   timestamp("created_at").defaultNow().notNull(),
 });
+
+/*
+ * Stores hashed admin invitation codes.
+ * The plaintext code is NEVER persisted — only returned once at creation.
+ *
+ * Security model:
+ *   - SHA-256 hash of the plaintext code stored in codeHash
+ *   - Each code is single-use (usedAt becomes non-null after consumption)
+ *   - Each code has a hard expiry (expiresAt)
+ *   - createdBy references the admin who generated it
+ *   - usedBy references the user who consumed it (set at registration)
+ */
+export const adminInvitations = pgTable(
+  "admin_invitations",
+  {
+    id:        text("id").primaryKey(),
+    codeHash:  text("code_hash").notNull(),
+    createdBy: text("created_by").notNull(), // admin user id
+    expiresAt: timestamp("expires_at").notNull(),
+    usedAt:    timestamp("used_at"),          // null = not yet used
+    usedBy:    text("used_by"),               // null until consumed
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+  },
+  (table) => ({
+    codeHashUnique: uniqueIndex("admin_invitations_code_hash_unique").on(
+      table.codeHash
+    ),
+    createdByIdx: index("admin_invitations_created_by_idx").on(
+      table.createdBy
+    ),
+  })
+);
+
+export type AdminInvitation    = typeof adminInvitations.$inferSelect;
+export type NewAdminInvitation = typeof adminInvitations.$inferInsert;
+
 
 export type AdminNotification    = typeof adminNotifications.$inferSelect;
 export type NewAdminNotification = typeof adminNotifications.$inferInsert;
