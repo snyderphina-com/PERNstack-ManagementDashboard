@@ -1,15 +1,13 @@
-import { betterAuth } from "better-auth";
-import { drizzleAdapter } from "better-auth/adapters/drizzle";
-import { db } from "../index.js";
-import * as schema from "../schema/auth.js";
-import { adminNotifications } from "../schema/app.js";
-
-/**
- * The admin invite code lives ONLY in the environment.
- * It is never written to the database.
- */
-const ADMIN_INVITE_CODE =
-  process.env.ADMIN_INVITE_CODE ?? "SNYDER-ADMIN-2025";
+import { betterAuth }        from "better-auth";
+import { drizzleAdapter }    from "better-auth/adapters/drizzle";
+import { and, eq, gt, isNull } from "drizzle-orm";
+import { db }                from "../index.js";
+import * as schema           from "../schema/auth.js";
+import { adminInvitations }  from "../schema/app.js";
+import {
+  hashInvitationCode,
+  normaliseCode,
+}                            from "../../services/invitationCode.js";
 
 export const auth = betterAuth({
   secret: process.env.BETTER_AUTH_SECRET!,
@@ -19,7 +17,7 @@ export const auth = betterAuth({
   advanced: {
     defaultCookieAttributes: {
       sameSite: "none",
-      secure: true,
+      secure:   true,
     },
   },
 
@@ -35,148 +33,160 @@ export const auth = betterAuth({
   user: {
     additionalFields: {
       role: {
-        type: "string",
-        required: false,
+        type:         "string",
+        required:     false,
         defaultValue: "student",
-        input: true,
+        input:        true,
       },
-
       imageCldPubId: {
-        type: "string",
+        type:     "string",
         required: false,
-        input: true,
+        input:    true,
       },
-
-      // Never settable by the client — set only in databaseHooks below
       status: {
-        type: "string",
-        required: false,
+        type:         "string",
+        required:     false,
         defaultValue: "active",
-        input: false,
+        input:        false, // client cannot set this
       },
-
       institution: {
-        type: "string",
+        type:     "string",
         required: false,
-        input: true,
+        input:    true,
       },
-
       studentId: {
-        type: "string",
+        type:     "string",
         required: false,
-        input: true,
+        input:    true,
       },
-
       subject: {
-        type: "string",
+        type:     "string",
         required: false,
-        input: true,
+        input:    true,
       },
-
       yearsOfExperience: {
-        type: "number",
+        type:     "number",
         required: false,
-        input: true,
+        input:    true,
       },
-
       qualification: {
-        type: "string",
+        type:     "string",
         required: false,
-        input: true,
+        input:    true,
       },
-
-      // Audit field — records whether a valid code was used.
-      // We store a REDACTED marker, never the raw code.
+      // Stores the invitation ID used (not the code, not the hash)
       adminInviteCodeUsed: {
-        type: "string",
+        type:     "string",
         required: false,
-        input: false, // client cannot set this
+        input:    false,
       },
     },
   },
 
-  /**
-   * Better Auth 1.6.25 correct hook API.
-   *
-   * `databaseHooks.user.create.before` receives:
-   *   user    — the data about to be written (includes additionalFields)
-   *   context — the endpoint context (may be null in some flows)
-   *
-   * Return `{ data: { ...overrides } }` to mutate what gets written.
-   * Return nothing / void to pass through unchanged.
-   *
-   * IMPORTANT: `adminInviteCode` is an INPUT field sent by the client
-   * but intentionally NOT declared in additionalFields, so Better Auth's
-   * parseUserInput will include it in the `rest` object that becomes part
-   * of the user data passed here. We read it, act on it, and strip it so
-   * it is never persisted.
-   */
   databaseHooks: {
     user: {
       create: {
         before: async (user) => {
-          // Cast to access the extra fields sent by the client
-          const incoming = user as typeof user & {
-            role?: string;
+          type IncomingUser = typeof user & {
+            role?:            string;
             adminInviteCode?: string;
-            status?: string;
+            status?:          string;
             adminInviteCodeUsed?: string;
           };
 
-          const role = incoming.role ?? "student";
+          const incoming = user as IncomingUser;
+          const role     = incoming.role ?? "student";
 
-          // Students and teachers are active by default — nothing to do
+          // ── Students and teachers: active, no invite needed ──────
           if (role !== "admin") {
             return {
               data: {
                 ...user,
-                status: "active",
-                // Ensure the raw invite code field never reaches the DB
+                status:              "active",
                 adminInviteCode:     undefined,
                 adminInviteCodeUsed: undefined,
               },
             };
           }
 
-          // ── Admin path ──────────────────────────────────────────
-          const providedCode = incoming.adminInviteCode ?? "";
-          const codeIsValid  = providedCode === ADMIN_INVITE_CODE;
+          // ── Admin path: invitation code is REQUIRED ───────────────
+          const rawCode = incoming.adminInviteCode ?? "";
 
-          // Build the safe data object — raw code is always stripped
-          const safeData = {
-            ...user,
-            status: codeIsValid ? "active" : "pending",
-            // Store a non-sensitive marker, never the raw code
-            adminInviteCodeUsed: codeIsValid ? "INVITE_CODE_USED" : null,
-            // Explicitly delete the raw code so it never reaches Drizzle
-            adminInviteCode: undefined,
-          };
-
-          // ── Insert a notification for existing admins ────────────
-          // We do this here so it's atomic with user creation.
-          // If the user ends up pending, admins need to know.
-          if (!codeIsValid) {
-            try {
-              await db.insert(adminNotifications).values({
-                id:          crypto.randomUUID(),
-                type:        "admin_approval_request",
-                title:       "New Admin Approval Request",
-                message:     `A new user (${incoming.name ?? "Unknown"}, ${incoming.email ?? "no email"}) has registered as an administrator and requires approval.`,
-                targetRole:  "admin",
-                referenceId: incoming.id ?? null,
-                read:        false,
-                createdAt:   new Date(),
-              });
-            } catch (notifErr) {
-              // Notification failure must NOT block account creation
-              console.error(
-                "[auth] Failed to insert admin notification:",
-                notifErr
-              );
-            }
+          if (!rawCode) {
+            throw new Error("Admin invitation code is required.");
           }
 
-          return { data: safeData };
+          const codeHash = hashInvitationCode(normaliseCode(rawCode));
+          const now      = new Date();
+
+          // Look up invitation by hash
+          const [invitation] = await db
+            .select()
+            .from(adminInvitations)
+            .where(eq(adminInvitations.codeHash, codeHash))
+            .limit(1);
+
+          if (!invitation) {
+            throw new Error("Invalid admin invitation code.");
+          }
+
+          if (invitation.expiresAt <= now) {
+            throw new Error("This admin invitation code has expired.");
+          }
+
+          if (invitation.usedAt !== null) {
+            throw new Error("This admin invitation code has already been used.");
+          }
+
+          // ── Mark invitation as used atomically ───────────────────
+          // We update here (before user row exists) so the invitation
+          // is consumed even if subsequent steps fail — preventing races.
+          // usedBy will be filled in the `after` hook once we have the id.
+          const [updated] = await db
+            .update(adminInvitations)
+            .set({ usedAt: now })
+            .where(
+              and(
+                eq(adminInvitations.id,     invitation.id),
+                isNull(adminInvitations.usedAt) // guard against race
+              )
+            )
+            .returning({ id: adminInvitations.id });
+
+          if (!updated) {
+            // Another request consumed this code between our SELECT and UPDATE
+            throw new Error("This admin invitation code has already been used.");
+          }
+
+          // Build the clean user record: raw code never reaches Drizzle
+          return {
+            data: {
+              ...user,
+              status:              "active",
+              adminInviteCodeUsed: invitation.id, // store the invitation ID, not the code
+              adminInviteCode:     undefined,
+            },
+          };
+        },
+
+        after: async (user) => {
+          // If this is an admin, backfill usedBy now that we have the user id.
+          // adminInviteCodeUsed holds the invitation id at this point.
+          const u = user as typeof user & {
+            role?:                string;
+            adminInviteCodeUsed?: string;
+          };
+
+          if (u.role === "admin" && u.adminInviteCodeUsed) {
+            await db
+              .update(adminInvitations)
+              .set({ usedBy: user.id })
+              .where(eq(adminInvitations.id, u.adminInviteCodeUsed))
+              .catch((err: unknown) => {
+                // Non-fatal — user is already created and active
+                console.error("[auth] Failed to backfill usedBy:", err);
+              });
+          }
         },
       },
     },
