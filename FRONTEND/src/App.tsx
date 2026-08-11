@@ -13,7 +13,7 @@ import "./App.css";
 import { Toaster }               from "./components/refine-ui/notification/toaster";
 import { useNotificationProvider } from "./components/refine-ui/notification/use-notification-provider";
 import { ThemeProvider }          from "./components/refine-ui/theme/theme-provider";
-import { BookOpen, Building2, ClipboardCheck, GraduationCap, Home, Users } from "lucide-react";
+import { BookOpen, Building2, ClipboardCheck, GraduationCap, Home, ShieldCheck, Users } from "lucide-react";
 
 // Pages
 import SubjectsList     from "./pages/subjects/list";
@@ -34,6 +34,8 @@ import EnrollmentConfirm from "./pages/enrollments/confirm";
 import { Login }        from "./pages/login";
 import { Register }     from "./pages/register";
 import PendingApproval  from "./pages/pending-approval";
+import AdminInvitationsPage from "./pages/admin/invitations";
+
 
 // Layout + providers
 import { Layout }        from "./components/refine-ui/layout/layout";
@@ -114,6 +116,16 @@ function App() {
                   show:   "/classes/show/:id",
                   meta: { label: "Classes", icon: <GraduationCap /> },
                 },
+                {
+                name: "admin/invitations",
+                list:   "/admin/invitations",
+                create: "/admin/invitations",
+                meta: {
+                label:  "Invitations",
+                icon:   <ShieldCheck />, 
+                hide:   false,
+                },
+              },
               ]}
             >
               <Routes>
@@ -129,7 +141,14 @@ function App() {
                   <Route path="/register" element={<Register />} />
                 </Route>
 
-                {/* ── Pending approval (authenticated but blocked) ── */}
+                <Route path="admin">
+                  <Route path="invitations" element={
+                    <RoleGuard allowedRoles={["admin"]}>
+                      <AdminInvitationsPage />
+                    </RoleGuard>
+                  } />
+                </Route>
+
                 <Route
                   path="/pending-approval"
                   element={
