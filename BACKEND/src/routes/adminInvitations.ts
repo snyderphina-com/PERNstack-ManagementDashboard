@@ -26,8 +26,8 @@ router.post(
     try {
       // requireRole attaches the session
       const session = (req as Request & {
-         Session: { user: { id: string } } })
-        .Session;
+         session: { user: { id: string } } })
+        .session;
 
       const adminId = session.user.id;
 
