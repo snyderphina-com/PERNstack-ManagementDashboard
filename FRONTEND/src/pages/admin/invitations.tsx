@@ -131,7 +131,7 @@ const {
     setRevoking(id);
     try {
       await axios.delete(
-        `${API}/api/admin/invitations/${id}`,
+        `${API}api/admin/invitations/${id}`,
         { withCredentials: true }
       );
       void refetchList();
