@@ -31,7 +31,7 @@ import type { User, AdminInvitation, InvitationStatus } from "@/types";
 import { getInvitationStatus }  from "@/types";
 import { cn }                   from "@/lib/utils";
 
-const API = import.meta.env.VITE_BACKEND_URL as string;
+const API = import.meta.env.VITE_BACKEND_BASE_URL as string;
 
 interface GeneratedCode {
   code:      string;
