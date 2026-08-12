@@ -110,7 +110,7 @@ const {
         code:      string;
         expiresAt: string;
       }>(
-        `${API}/api/admin/invitations`,
+        `${API}api/admin/invitations`,
         {},
         { withCredentials: true }
       );
