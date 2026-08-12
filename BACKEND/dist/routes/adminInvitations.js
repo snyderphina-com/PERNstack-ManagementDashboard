@@ -17,7 +17,7 @@ router.post("/", requireRole(["admin"]), async (req, res) => {
     try {
         // requireRole attaches the session
         const session = req
-            .Session;
+            .session;
         const adminId = session.user.id;
         const plaintext = generateInvitationCode();
         const codeHash = hashInvitationCode(plaintext);

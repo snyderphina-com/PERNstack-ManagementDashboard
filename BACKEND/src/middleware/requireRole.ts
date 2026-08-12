@@ -52,6 +52,11 @@ export function requireRole(allowedRoles: Role[]) {
       // Attach session to request for downstream handlers
       (req as Request & { session: typeof session }).session = session;
 
+console.log("REQUIRE ROLE - session user:", session.user);
+console.log("REQUIRE ROLE - req.session:", (req as Request & {
+  session?: typeof session;
+}).session);
+
       next();
     } catch (err) {
       console.error("requireRole error:", err);

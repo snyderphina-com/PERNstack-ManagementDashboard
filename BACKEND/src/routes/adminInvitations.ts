@@ -29,6 +29,14 @@ router.post(
          session: { user: { id: string } } })
         .session;
 
+console.log("INVITATION ROUTE - req.session:", session);
+
+if (!session?.user?.id) {
+  return res.status(401).json({
+    error: "Session missing from request",
+  });
+}
+
       const adminId = session.user.id;
 
       const plaintext = generateInvitationCode();
