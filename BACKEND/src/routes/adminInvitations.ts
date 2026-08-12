@@ -25,8 +25,9 @@ router.post(
   async (req: Request, res: Response) => {
     try {
       // requireRole attaches the session
-      const session = (req as Request & { appSession: { user: { id: string } } })
-        .appSession;
+      const session = (req as Request & {
+         Session: { user: { id: string } } })
+        .Session;
 
       const adminId = session.user.id;
 
