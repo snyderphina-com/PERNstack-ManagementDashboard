@@ -22,8 +22,7 @@ export function AdminFields({ register, errors, disabled }: AdminFieldsProps) {
           account will be created with <strong>pending</strong> status and must
           be approved by an existing administrator.
         </p>   <p className="text-xs text-amber-700/80 dark:text-amber-300/80 leading-snug">
-            Admin accounts can only be created with a valid invitation code
-            issued by an existing administrator. The code is single-use and
+             The code is single-use and
             expires after 7 days.
           </p>
       </div>
