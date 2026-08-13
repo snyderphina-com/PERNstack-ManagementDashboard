@@ -1,13 +1,13 @@
 import type { UserRole } from "@/types";
 
-/** Dashboard route each role lands on after login / signup */
+/* Dashboard route each role lands on after login / signup */
 export const ROLE_DASHBOARD: Record<UserRole, string> = {
   student: "/student/dashboard",
   teacher: "/teacher/dashboard",
   admin:   "/admin/dashboard",
 };
 
-/** Human-readable labels */
+
 export const ROLE_LABELS: Record<UserRole, string> = {
   student: "Student",
   teacher: "Teacher",
