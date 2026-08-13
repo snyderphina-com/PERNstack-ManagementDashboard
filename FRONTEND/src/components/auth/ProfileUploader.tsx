@@ -5,7 +5,8 @@ import { Button } from "@/components/ui/button";
 
 interface ProfileUploaderProps {
   value?: string | null;          // current preview URL
-  onChange: (result: { url: string; publicId: string } | null) => void;
+  onChange: (result: { url: string; 
+    publicId: string } | null) => void;
   disabled?: boolean;
   className?: string;
 }
@@ -13,10 +14,10 @@ interface ProfileUploaderProps {
 const MAX_SIZE_MB  = 5;
 const ALLOWED_TYPES = ["image/jpeg", "image/png", "image/webp", "image/gif"];
 
-/**
- * Uploads directly to Cloudinary via signed upload.
- * The signature is fetched from your backend so CLOUDINARY_API_SECRET
- * never leaves the server.
+/*
+  Uploads directly to Cloudinary via signed upload.
+  The signature is fetched from backend so CLOUDINARY_API_SECRET
+ never leaves the server.
  */
 async function uploadToCloudinary(file: File): Promise<{
   url: string;
