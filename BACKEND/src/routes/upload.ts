@@ -6,9 +6,7 @@ const router = Router();
 /**
  * POST /api/upload/image
  * Body: { image: string }  — base64 data URI or remote URL
- *
- * Use this when you want the image proxied through your server.
- * For large files prefer the signed-upload flow below.
+ 
  */
 router.post("/image", async (req: Request, res: Response) => {
   try {
@@ -37,7 +35,7 @@ router.post("/image", async (req: Request, res: Response) => {
 /**
  * GET /api/upload/sign
  * Returns a signed payload the browser uses to upload directly to Cloudinary.
- * This is the recommended approach — keeps your API_SECRET on the server.
+ * This is the recommended approach — keeps API_SECRET on the server.
  */
 router.get("/sign", (_req: Request, res: Response) => {
   try {
