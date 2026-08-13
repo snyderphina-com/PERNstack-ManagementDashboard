@@ -148,7 +148,7 @@ export interface Permission {
   resource: string;
 }
 
-// ── Admin Invitation types ─────────────────────────────────────────
+//Admin Invitation types
 export type InvitationStatus = "active" | "expired" | "used";
 
 export interface AdminInvitation {
