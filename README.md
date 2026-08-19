@@ -12,6 +12,15 @@ The project demonstrates practical experience in full-stack development, authent
 
 ![Dashboard](./classview.png)
 
+# Role-Based Authentication
+# As a student
+![Dashboard](./stu.png)
+
+# As a teacher
+![Dashboard](./tr.png)
+
+# As an admin
+![Dashboard](./admin.png)
 Features
 User registration and sign-in
 Email/password authentication
