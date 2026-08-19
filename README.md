@@ -6,7 +6,7 @@ Overview
 
 The PERN Stack Admin Dashboard is a full-stack web application built with React and TypeScript on the frontend and Node.js, Express, PostgreSQL, and Drizzle ORM on the backend.
 
-![Dashboard](./screenshots/role.png)
+![Dashboard](./role.png)
 
 The project demonstrates practical experience in full-stack development, authentication, database management, API development, role-based authorization, and modern frontend development.
 
