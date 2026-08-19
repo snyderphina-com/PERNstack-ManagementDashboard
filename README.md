@@ -10,6 +10,8 @@ The PERN Stack Admin Dashboard is a full-stack web application built with React 
 
 The project demonstrates practical experience in full-stack development, authentication, database management, API development, role-based authorization, and modern frontend development.
 
+![Dashboard](./classview.png)
+
 Features
 User registration and sign-in
 Email/password authentication
